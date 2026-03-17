@@ -18,9 +18,9 @@ Experience a seamless workflow from capturing receipts to managing data.
 | | |
 |:---:|:---:|
 | **Camera View** | **Scan Result** |
-| ![Camera](https://raw.githubusercontent.com/widifirmaan/billy-membaca/main/public/screenshots/camera.png)<br>*Manual AI/OCR Toggle & Controls* | ![Result](https://raw.githubusercontent.com/widifirmaan/billy-membaca/main/public/screenshots/result.png)<br>*Structured Data Extraction* |
+| ![Camera](public/screenshots/camera.png)<br>*Manual AI/OCR Toggle & Controls* | ![Result](public/screenshots/result.png)<br>*Structured Data Extraction* |
 | **History View** | **Settings** |
-| ![History](https://raw.githubusercontent.com/widifirmaan/billy-membaca/main/public/screenshots/history.png)<br>*Manage Saved Receipts* | ![Settings](https://raw.githubusercontent.com/widifirmaan/billy-membaca/main/public/screenshots/settings.png)<br>*AI & Image Quality Config* |
+| ![History](public/screenshots/history.png)<br>*Manage Saved Receipts* | ![Settings](public/screenshots/settings.png)<br>*AI & Image Quality Config* |
 
 ---
 
