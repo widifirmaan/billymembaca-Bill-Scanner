@@ -1,0 +1,16 @@
+{
+  "name": "billy-membaca",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "tesseract.js": "^7.0.0",
+    "vite": "^8.0.0",
+    "xlsx": "^0.18.5"
+  }
+}
