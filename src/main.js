@@ -2,7 +2,7 @@
 
 import './style.css';
 import { startCamera, stopCamera, flipCamera, capturePhoto, compressFileImage, getBase64Data, getFileSizeKB } from './camera.js';
-import { analyzeWithGemini, isGeminiAvailable } from './gemini.js';
+import { analyzeWithGroq } from './groq.js';
 import { recognizeText } from './ocr.js';
 import { parseReceiptText } from './parser.js';
 import { renderTable, addRow, getTableData, formatRupiah } from './table.js';
@@ -114,28 +114,35 @@ async function handleAnalyze() {
   };
 
   let result = null;
+  const engine = localStorage.getItem('aiEngine') || 'gemini';
+  const mode = localStorage.getItem('analysisMode') || 'ai-first';
 
   try {
-    if (isGeminiAvailable()) {
-      // Try Gemini AI first
-      titleEl.textContent = '🤖 Menganalisis dengan AI...';
+    if (mode === 'ai-first') {
+      // Try Selected AI first
+      titleEl.textContent = `🤖 Menganalisis dengan ${engine === 'groq' ? 'Groq' : 'Gemini'} AI...`;
       progressFill.style.width = '30%';
 
       try {
         const base64 = getBase64Data(currentImageData);
-        result = await analyzeWithGemini(base64, updateStatus);
+        if (engine === 'groq') {
+          result = await analyzeWithGroq(base64, updateStatus);
+        } else {
+          result = await analyzeWithGemini(base64, updateStatus);
+        }
         progressFill.style.width = '100%';
-        showToast('Berhasil dianalisis oleh AI! ✨', 'success');
+        showToast(`Berhasil dianalisis oleh ${engine === 'groq' ? 'Groq' : 'Gemini'}! ✨`, 'success');
       } catch (aiErr) {
-        console.warn('AI failed, falling back to OCR:', aiErr.message);
+        console.error('AI analysis failed:', aiErr);
 
-        let reason = 'Error';
-        if (aiErr.message === 'TIMEOUT') reason = 'Timeout';
-        else if (aiErr.message === 'RATE_LIMITED') reason = 'Rate limited';
-        else if (aiErr.message === 'API_KEY_MISSING') reason = 'API key belum diisi';
-        else if (aiErr.message === 'SERVER_ERROR') reason = 'Server error';
+        let reason = aiErr.message;
+        if (aiErr.message === 'TIMEOUT') reason = 'Timeout (koneksi lambat)';
+        else if (aiErr.message === 'RATE_LIMITED') reason = 'Batas limit tercapai (429)';
+        else if (aiErr.message === 'API_KEY_MISSING' || aiErr.message === 'GROQ_API_KEY_MISSING') reason = 'API key belum diisi';
+        else if (aiErr.message === 'SERVER_ERROR') reason = 'Server AI bermasalah (5xx)';
+        else if (aiErr.message.startsWith('API_ERROR:')) reason = aiErr.message.replace('API_ERROR:', 'API Error:');
 
-        updateStatus(`AI gagal (${reason}), beralih ke OCR...`);
+        updateStatus(`AI gagal: ${reason}, beralih ke OCR...`);
         titleEl.textContent = '📝 Beralih ke OCR...';
         progressFill.style.width = '40%';
 
@@ -360,25 +367,32 @@ function escapeHtml(str) {
 
 // ===== Settings =====
 function initSettings() {
-  const apiKeyEl = $('#gemini-api-key');
+  const apiKeyEl = $('#groq-api-key');
   const timeoutEl = $('#ai-timeout');
   const modeEl = $('#analysis-mode');
   const qualityEl = $('#image-quality');
   const qualityValueEl = $('#image-quality-value');
   const resolutionEl = $('#max-resolution');
-  const toggleKeyBtn = $('#btn-toggle-key');
+  
+  const toggleKeyBtn = $('#btn-toggle-groq-key');
   const clearHistoryBtn = $('#btn-clear-history');
 
   // Load saved values
-  apiKeyEl.value = localStorage.getItem('geminiApiKey') || '';
-  timeoutEl.value = localStorage.getItem('aiTimeout') || '15';
+  const defaultApiKey = import.meta.env.VITE_GROQ_API_KEY || '';
+
+  if (!localStorage.getItem('groqApiKey') && defaultApiKey) {
+    localStorage.setItem('groqApiKey', defaultApiKey);
+  }
+
+  apiKeyEl.value = localStorage.getItem('groqApiKey') || '';
+  timeoutEl.value = localStorage.getItem('aiTimeout') || '60';
   modeEl.value = localStorage.getItem('analysisMode') || 'ai-first';
   qualityEl.value = localStorage.getItem('imageQuality') || '60';
   qualityValueEl.textContent = qualityEl.value + '%';
   resolutionEl.value = localStorage.getItem('maxResolution') || '1920';
 
   // Save on change
-  apiKeyEl.addEventListener('input', () => localStorage.setItem('geminiApiKey', apiKeyEl.value));
+  apiKeyEl.addEventListener('input', () => localStorage.setItem('groqApiKey', apiKeyEl.value));
   timeoutEl.addEventListener('input', () => localStorage.setItem('aiTimeout', timeoutEl.value));
   modeEl.addEventListener('change', () => localStorage.setItem('analysisMode', modeEl.value));
   qualityEl.addEventListener('input', () => {
