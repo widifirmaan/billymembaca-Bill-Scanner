@@ -63,7 +63,10 @@ function handleCapture() {
   const canvasEl = $('#camera-canvas');
 
   currentImageData = capturePhoto(videoEl, canvasEl);
-  showCapturedPreview(currentImageData);
+  if (currentImageData) {
+    stopCamera();
+    handleAnalyze();
+  }
 }
 
 async function handleFileUpload(e) {
@@ -72,7 +75,9 @@ async function handleFileUpload(e) {
 
   try {
     currentImageData = await compressFileImage(file);
-    showCapturedPreview(currentImageData);
+    if (currentImageData) {
+      handleAnalyze();
+    }
   } catch (err) {
     showToast('Gagal memproses gambar', 'error');
   }
