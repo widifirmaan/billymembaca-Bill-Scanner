@@ -1,0 +1,6 @@
+{
+  "appId": "com.billymembaca.app",
+  "appName": "Billy Membaca",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}
