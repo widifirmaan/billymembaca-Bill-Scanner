@@ -23,7 +23,6 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
-          cache: 'gradle'
 
       - name: Install Dependencies
         run: |
@@ -35,9 +34,11 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Install Capacitor
+        run: npm install @capacitor/cli @capacitor/core @capacitor/android
+
       - name: Initialize Android Platform
         run: |
-          # Since capacitor.config.json already exists, we only need to add and sync
           npx cap add android || true
           npx cap sync android
 
