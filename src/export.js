@@ -12,7 +12,7 @@ export function exportSingleReceipt(receipt) {
     [],
     ['Toko', receipt.store_name || 'Tidak Diketahui'],
     ['Tanggal', receipt.date || '-'],
-    ['Metode', receipt.method === 'ai' ? 'Gemini AI' : 'OCR'],
+    ['Metode', receipt.method === 'ai' ? 'Groq AI' : 'OCR'],
     [],
     ['No', 'Item', 'Qty', 'Harga', 'Subtotal'],
   ];

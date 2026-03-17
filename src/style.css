@@ -168,6 +168,79 @@ body {
   object-fit: cover;
 }
 
+.analysis-switcher-container {
+  position: absolute;
+  top: var(--gap-md);
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.analysis-switcher {
+  display: flex;
+  position: relative;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px;
+  border-radius: var(--radius-full);
+  pointer-events: auto;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.switcher-btn {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: var(--radius-full);
+}
+
+.switcher-btn.active {
+  color: white;
+}
+
+.switcher-btn svg {
+  opacity: 0.7;
+}
+
+.switcher-btn.active svg {
+  opacity: 1;
+  filter: drop-shadow(0 0 5px var(--accent-light));
+}
+
+.switcher-slider {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  height: calc(100% - 8px);
+  width: calc(50% - 4px);
+  background: var(--accent);
+  border-radius: var(--radius-full);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+.analysis-switcher[data-selected="ocr-only"] .switcher-slider {
+  transform: translateX(100%);
+  background: var(--success);
+  box-shadow: 0 2px 8px var(--success-glow);
+}
+
 #viewfinder {
   position: absolute;
   inset: 15%;
@@ -188,16 +261,21 @@ body {
 .corner.br { bottom: 0; right: 0; border-bottom-width: 3px; border-right-width: 3px; border-radius: 0 0 4px 0; }
 
 #camera-controls {
-  position: absolute;
-  bottom: 0;
+  position: fixed;
+  bottom: calc(var(--nav-height) + var(--gap-md));
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: var(--gap-xl);
-  padding: var(--gap-lg);
-  background: linear-gradient(transparent, rgba(0,0,0,0.7));
+  padding: 0 var(--gap-lg);
+  z-index: 50;
+  pointer-events: none;
+}
+
+#camera-controls > * {
+  pointer-events: auto;
 }
 
 .btn-shutter {
@@ -632,6 +710,7 @@ tfoot td {
 
 .setting-item select {
   appearance: none;
+  -webkit-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238888a8' stroke-width='2' fill='none'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
@@ -675,6 +754,7 @@ tfoot td {
   height: 4px;
   -webkit-appearance: none;
   appearance: none;
+  -webkit-appearance: none;
   background: var(--bg-glass);
   border-radius: var(--radius-full);
   outline: none;

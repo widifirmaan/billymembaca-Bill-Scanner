@@ -22,8 +22,12 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  // Network-first for API calls
-  if (e.request.url.includes('generativelanguage.googleapis.com')) {
+  // Only handle GET requests for caching
+  if (e.request.method !== 'GET') return;
+
+  // Exclude AI API calls from caching
+  const url = e.request.url;
+  if (url.includes('api.groq.com') || url.includes('generativelanguage.googleapis.com')) {
     return;
   }
 
@@ -31,6 +35,10 @@ self.addEventListener('fetch', (e) => {
     caches.match(e.request).then((cached) => {
       const fetched = fetch(e.request)
         .then((response) => {
+          // Check if we received a valid response
+          if (!response || response.status !== 200 || response.type !== 'basic') {
+            return response;
+          }
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
           return response;

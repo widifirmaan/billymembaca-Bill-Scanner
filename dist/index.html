@@ -11,7 +11,7 @@
   <link rel="icon" type="image/svg+xml" href="/icon.svg" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <title>Billy Membaca - Scanner Nota Belanja</title>
-  <script type="module" crossorigin src="/assets/index-CxQ_Adzx.js"></script>
+  <script type="module" crossorigin src="/assets/index-BDwAr0S5.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-B7stDCc2.css">
 </head>
 <body>
@@ -63,7 +63,7 @@
           <label class="btn-upload" for="file-input">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           </label>
-          <input type="file" id="file-input" accept="image/*" capture="environment" style="display:none;" />
+          <input type="file" id="file-input" accept="image/*" style="display:none;" />
           <button id="btn-capture" class="btn-shutter">
             <div class="shutter-ring"></div>
           </button>
@@ -92,7 +92,7 @@
           <img id="processing-image" alt="Processing" />
         </div>
         <h2 id="processing-title">Menganalisis Nota...</h2>
-        <p id="processing-status">Mengirim ke Gemini AI...</p>
+        <p id="processing-status">Menganalisis dengan Groq AI...</p>
         <div class="progress-bar">
           <div id="progress-fill" class="progress-fill"></div>
         </div>
@@ -176,21 +176,21 @@
         <h1>⚙️ Pengaturan</h1>
       </div>
       <div class="settings-group">
-        <h3>🤖 Gemini AI</h3>
+        <h3>🤖 AI Processing (Groq)</h3>
         <div class="setting-item">
-          <label for="gemini-api-key">API Key</label>
+          <label for="groq-api-key">Groq API Key</label>
           <div class="input-with-action">
-            <input type="password" id="gemini-api-key" placeholder="Masukkan Gemini API Key" />
-            <button id="btn-toggle-key" class="btn-icon" title="Tampilkan/Sembunyikan">
+            <input type="password" id="groq-api-key" placeholder="Masukkan Groq API Key" />
+            <button id="btn-toggle-groq-key" class="btn-icon" title="Tampilkan/Sembunyikan">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
-          <small>Dapatkan API key dari <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a></small>
+          <small>Dapatkan di <a href="https://console.groq.com/keys" target="_blank">Groq Console</a></small>
         </div>
         <div class="setting-item">
           <label for="ai-timeout">Timeout (detik)</label>
-          <input type="number" id="ai-timeout" value="15" min="5" max="60" />
-          <small>Jika AI tidak merespons dalam waktu ini, otomatis fallback ke OCR</small>
+          <input type="number" id="ai-timeout" value="60" min="5" max="120" />
+          <small>Otomatis fallback ke OCR jika AI tidak merespons</small>
         </div>
         <div class="setting-item">
           <label for="analysis-mode">Mode Analisis</label>

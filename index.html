@@ -49,6 +49,19 @@
         <p>Foto nota belanja untuk dibaca otomatis</p>
       </div>
       <div id="camera-container">
+        <div class="analysis-switcher-container">
+          <div class="analysis-switcher">
+            <button class="switcher-btn active" data-mode="ai-first">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M12 2a10 10 0 0 1 10 10h-2a8 8 0 0 0-8-8V2z"/></svg>
+              AI
+            </button>
+            <button class="switcher-btn" data-mode="ocr-only">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
+              OCR
+            </button>
+            <div class="switcher-slider"></div>
+          </div>
+        </div>
         <video id="camera-preview" autoplay playsinline></video>
         <canvas id="camera-canvas" style="display:none;"></canvas>
         <div id="viewfinder">
@@ -57,18 +70,20 @@
           <div class="corner bl"></div>
           <div class="corner br"></div>
         </div>
-        <div id="camera-controls">
-          <label class="btn-upload" for="file-input">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          </label>
-          <input type="file" id="file-input" accept="image/*" style="display:none;" />
-          <button id="btn-capture" class="btn-shutter">
-            <div class="shutter-ring"></div>
-          </button>
-          <button id="btn-flip" class="btn-flip-camera">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-          </button>
-        </div>
+      </div>
+      
+      <!-- Camera Controls -->
+      <div id="camera-controls">
+        <label class="btn-upload" for="file-input">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </label>
+        <input type="file" id="file-input" accept="image/*" style="display:none;" />
+        <button id="btn-capture" class="btn-shutter">
+          <div class="shutter-ring"></div>
+        </button>
+        <button id="btn-flip" class="btn-flip-camera">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </button>
       </div>
       <div id="captured-preview" style="display:none;">
         <img id="captured-image" alt="Captured receipt" />
@@ -90,7 +105,7 @@
           <img id="processing-image" alt="Processing" />
         </div>
         <h2 id="processing-title">Menganalisis Nota...</h2>
-        <p id="processing-status">Mengirim ke Gemini AI...</p>
+        <p id="processing-status">Menganalisis dengan Groq AI...</p>
         <div class="progress-bar">
           <div id="progress-fill" class="progress-fill"></div>
         </div>
@@ -175,7 +190,7 @@
       </div>
       <div class="settings-group">
         <h3>🤖 AI Processing (Groq)</h3>
-        <div class="setting-item">
+        <div class="setting-item" style="display:none;">
           <label for="groq-api-key">Groq API Key</label>
           <div class="input-with-action">
             <input type="password" id="groq-api-key" placeholder="Masukkan Groq API Key" />
@@ -193,7 +208,7 @@
         <div class="setting-item">
           <label for="analysis-mode">Mode Analisis</label>
           <select id="analysis-mode">
-            <option value="ai-first">AI Dulu, Fallback OCR</option>
+            <option value="ai-first">AI (Groq)</option>
             <option value="ocr-only">OCR Saja</option>
           </select>
         </div>

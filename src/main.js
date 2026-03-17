@@ -114,45 +114,20 @@ async function handleAnalyze() {
   };
 
   let result = null;
-  const engine = localStorage.getItem('aiEngine') || 'gemini';
   const mode = localStorage.getItem('analysisMode') || 'ai-first';
 
   try {
     if (mode === 'ai-first') {
-      // Try Selected AI first
-      titleEl.textContent = `🤖 Menganalisis dengan ${engine === 'groq' ? 'Groq' : 'Gemini'} AI...`;
+      // AI Mode
+      titleEl.textContent = '🤖 Menganalisis dengan Groq AI...';
       progressFill.style.width = '30%';
 
-      try {
-        const base64 = getBase64Data(currentImageData);
-        if (engine === 'groq') {
-          result = await analyzeWithGroq(base64, updateStatus);
-        } else {
-          result = await analyzeWithGemini(base64, updateStatus);
-        }
-        progressFill.style.width = '100%';
-        showToast(`Berhasil dianalisis oleh ${engine === 'groq' ? 'Groq' : 'Gemini'}! ✨`, 'success');
-      } catch (aiErr) {
-        console.error('AI analysis failed:', aiErr);
-
-        let reason = aiErr.message;
-        if (aiErr.message === 'TIMEOUT') reason = 'Timeout (koneksi lambat)';
-        else if (aiErr.message === 'RATE_LIMITED') reason = 'Batas limit tercapai (429)';
-        else if (aiErr.message === 'API_KEY_MISSING' || aiErr.message === 'GROQ_API_KEY_MISSING') reason = 'API key belum diisi';
-        else if (aiErr.message === 'SERVER_ERROR') reason = 'Server AI bermasalah (5xx)';
-        else if (aiErr.message.startsWith('API_ERROR:')) reason = aiErr.message.replace('API_ERROR:', 'API Error:');
-
-        updateStatus(`AI gagal: ${reason}, beralih ke OCR...`);
-        titleEl.textContent = '📝 Beralih ke OCR...';
-        progressFill.style.width = '40%';
-
-        // Wait a moment so user sees the fallback message
-        await new Promise((r) => setTimeout(r, 800));
-      }
-    }
-
-    // Fallback to OCR if AI didn't work
-    if (!result) {
+      const base64 = getBase64Data(currentImageData);
+      result = await analyzeWithGroq(base64, updateStatus);
+      progressFill.style.width = '100%';
+      showToast('Berhasil dianalisis oleh Groq! ✨', 'success');
+    } else {
+      // OCR Mode
       titleEl.textContent = '📝 Membaca dengan OCR...';
       progressFill.style.width = '50%';
 
@@ -173,7 +148,15 @@ async function handleAnalyze() {
       showToast('Berhasil dibaca dengan OCR', 'success');
     }
 
-    // Show result
+    // Show result (merge if already exists)
+    if (currentReceipt && currentReceipt.items && result.items) {
+      result.items = [...currentReceipt.items, ...result.items];
+      // Keep original store name and date if they exist
+      result.store_name = currentReceipt.store_name || result.store_name;
+      result.date = currentReceipt.date || result.date;
+      result.method = 'mixed';
+    }
+    
     currentReceipt = result;
     showResult(result);
   } catch (err) {
@@ -191,7 +174,7 @@ function showResult(receipt) {
   // Method badge
   const badge = $('#result-method');
   if (receipt.method === 'ai') {
-    badge.textContent = '🤖 Gemini AI';
+    badge.textContent = '🤖 Groq AI';
     badge.className = 'method-badge ai';
   } else {
     badge.textContent = '📝 OCR + Parser';
@@ -415,6 +398,44 @@ function initSettings() {
   });
 }
 
+// ===== Analysis Switcher =====
+function initAnalysisSwitcher() {
+  const switcher = $('.analysis-switcher');
+  const btns = $$('.switcher-btn');
+  
+  // Set initial state
+  const currentMode = localStorage.getItem('analysisMode') || 'ai-first';
+  setSwitcherMode(currentMode);
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.mode;
+      localStorage.setItem('analysisMode', mode);
+      setSwitcherMode(mode);
+      
+      // Update the settings dropdown if it exists
+      const settingsModeEl = $('#analysis-mode');
+      if (settingsModeEl) settingsModeEl.value = mode;
+      
+      showToast(`Mode analisis: ${mode === 'ai-first' ? 'AI' : 'OCR'}`, 'info');
+    });
+  });
+}
+
+function setSwitcherMode(mode) {
+  const switcher = $('.analysis-switcher');
+  const btns = $$('.switcher-btn');
+  
+  switcher.setAttribute('data-selected', mode);
+  btns.forEach(btn => {
+    if (btn.dataset.mode === mode) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+}
+
 // ===== Event Listeners =====
 function initEventListeners() {
   // Navigation
@@ -436,8 +457,14 @@ function initEventListeners() {
   $('#btn-save').addEventListener('click', handleSave);
   $('#btn-export-single').addEventListener('click', handleExportSingle);
   $('#btn-scan-again').addEventListener('click', () => {
+    // Preserve currentReceipt to allow appending
+    const tbodyEl = $('#items-tbody');
+    if (currentReceipt) {
+      currentReceipt.items = getTableData(tbodyEl);
+      currentReceipt.store_name = $('#store-name').value;
+      currentReceipt.date = $('#receipt-date').value;
+    }
     currentImageData = null;
-    currentReceipt = null;
     showView('camera');
   });
   $('#btn-add-row').addEventListener('click', () => {
@@ -466,6 +493,7 @@ function registerSW() {
 function init() {
   initEventListeners();
   initSettings();
+  initAnalysisSwitcher();
   registerSW();
   showView('camera');
 }

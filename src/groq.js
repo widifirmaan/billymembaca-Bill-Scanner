@@ -1,16 +1,17 @@
 // Groq AI module - alternative receipt analysis engine using Llama 3.2 Vision
+import { parsePrice } from './utils.js';
 
 const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-const PROMPT = `Kamu adalah asisten yang ahli membaca nota/struk/bill belanja. 
-Analisis foto nota belanja ini dan ekstrak data dalam format JSON berikut:
+const PROMPT = `Kamu adalah asisten yang ahli membaca berbagai jenis nota, struk belanja, dan bukti transaksi bank (struk ATM/EDC).
+Analisis foto ini dan ekstrak data dalam format JSON berikut:
 
 {
-  "store_name": "Nama Toko",
+  "store_name": "Nama Toko atau Nama Bank",
   "date": "YYYY-MM-DD",
   "items": [
     {
-      "name": "Nama barang",
+      "name": "Nama barang atau jenis transaksi",
       "qty": 1,
       "price": 10000
     }
@@ -18,13 +19,14 @@ Analisis foto nota belanja ini dan ekstrak data dalam format JSON berikut:
   "total": 50000
 }
 
-Aturan:
-- Harga dalam Rupiah (angka saja, tanpa Rp atau titik)
-- Jika qty tidak terlihat, asumsikan 1
-- Jika tanggal tidak terbaca, gunakan null
-- Jika nama toko tidak terbaca, gunakan "Tidak Diketahui"
-- Fokus hanya pada item belanja, abaikan info pajak/diskon kecuali jelas terpisah
-- HANYA output JSON, tanpa teks lain`;
+Aturan Khusus:
+1. Nama Toko: Untuk struk bank, gunakan nama bank (contoh: "Bank Mandiri") atau nama agen (contoh: "Mandiri Rudi Cell").
+2. Tanggal: Cari tanggal transaksi (contoh: "04 JULY 20" -> "2020-07-04").
+3. Items: 
+   - Jika struk belanja: Daftar barang seperti biasa.
+   - Jika struk bank/transaksi tunggal: Gunakan jenis transaksi sebagai nama item (contoh: "TARIK TUNAI AGEN").
+4. Harga: Angka saja, tanpa Rp atau titik/koma ribuan.
+5. HANYA output JSON, tanpa teks lain.`;
 
 export async function analyzeWithGroq(base64Image, onStatus) {
   const apiKey = localStorage.getItem('groqApiKey');
@@ -42,7 +44,7 @@ export async function analyzeWithGroq(base64Image, onStatus) {
   try {
     const response = await fetch(API_URL, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
@@ -95,17 +97,21 @@ export async function analyzeWithGroq(base64Image, onStatus) {
     return {
       store_name: parsedResult.store_name || 'Tidak Diketahui',
       date: parsedResult.date || null,
-      items: (parsedResult.items || []).map((item, i) => ({
-        name: item.name || `Item ${i + 1}`,
-        qty: Math.max(1, parseInt(item.qty) || 1),
-        price: Math.max(0, parseFloat(item.price) || 0),
-      })),
-      total:
+      items: (parsedResult.items || []).map((item, i) => {
+        const p = parsePrice(item.price);
+        return {
+          name: item.name || `Item ${i + 1}`,
+          qty: Math.max(1, parseInt(item.qty) || 1),
+          price: p,
+        };
+      }),
+      total: parsePrice(
         parsedResult.total ||
         (parsedResult.items || []).reduce(
-          (sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.qty) || 1),
+          (sum, item) => sum + (parsePrice(item.price)) * (parseInt(item.qty) || 1),
           0
-        ),
+        )
+      ),
       method: 'ai',
       engine: 'groq'
     };

@@ -1,4 +1,5 @@
 // Receipt parser - extracts structured data from raw OCR text
+import { parsePrice } from './utils.js';
 
 export function parseReceiptText(rawText) {
   const lines = rawText
@@ -22,11 +23,15 @@ export function parseReceiptText(rawText) {
 
 function extractStoreName(lines) {
   // Usually the first 1-2 non-empty, non-date lines
-  for (const line of lines.slice(0, 3)) {
+  for (const line of lines.slice(0, 5)) {
     // Skip lines that are just numbers, dates, or addresses
     if (/^\d+[\/\-]\d+[\/\-]\d+/.test(line)) continue;
-    if (/^(jl\.|jalan|telp|hp|no\.|alamat)/i.test(line)) continue;
+    if (/^(jl\.|jalan|telp|hp|no\.|alamat|komp\.)/i.test(line)) continue;
     if (/^\d+$/.test(line)) continue;
+    
+    // If it contains bank names, it's likely the store
+    if (/(mandiri|bri|bca|bni|cimb|danamon|bank)/i.test(line)) return line;
+    
     if (line.length > 3) return line;
   }
   return 'Tidak Diketahui';
@@ -61,22 +66,32 @@ function extractDate(text) {
 function extractItems(lines) {
   const items = [];
 
-  // Common receipt patterns:
-  // "Item Name    Rp 10.000" 
-  // "Item Name  2 x 5.000  10.000"
-  // "2 Item Name  10,000"
-
+  // Common receipt patterns
   const pricePattern = /(?:rp\.?\s*)?(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{1,2})?)\s*$/i;
   const qtyPricePattern = /(\d+)\s*[x×@]\s*(?:rp\.?\s*)?(\d{1,3}(?:[.,]\d{3})*)/i;
+  
+  // Bank transaction pattern: "TARIK TUNAI AGEN"
+  const bankTransactionPattern = /^(tarik tunai|transfer|pembayaran|setoran|mutasi|isi ulang|top up)/i;
 
   for (const line of lines) {
-    // Skip header/footer lines
-    if (/^(total|subtotal|grand|tunai|cash|kembali|kembalian|change|tax|pajak|ppn|disc|diskon)/i.test(line)) continue;
+    // Skip header/footer lines but allow some bank keywords
+    if (/^(total|subtotal|grand|tunai|cash|kembali|kembalian|change|tax|pajak|ppn|disc|diskon|adm|admin)/i.test(line) && !bankTransactionPattern.test(line)) continue;
+    
     if (/^[\-=\*\.]+$/.test(line)) continue;
-    if (/^(jl\.|jalan|telp|hp|no\.|alamat|terima|kasih|thank)/i.test(line)) continue;
+    if (/^(jl\.|jalan|telp|hp|no\.|alamat|terima|kasih|thank|notifikasi|tanda|terima|pelanggan)/i.test(line)) continue;
     if (line.length < 3) continue;
 
     const priceMatch = line.match(pricePattern);
+    
+    // If it matches a bank transaction type but no price on the same line, it might be a header for the price on next line
+    // But usually bank receipts have "TOTAL : Rp 25.000"
+    // So if it's a bank transaction line, we might want to capture it as the item name if it's prominent
+    if (bankTransactionPattern.test(line) && !priceMatch) {
+        // Special case: "TARIK TUNAI AGEN"
+        // We'll search for the price in the next few lines or "TOTAL" lines
+        continue; 
+    }
+
     if (!priceMatch) continue;
 
     const price = parsePrice(priceMatch[1]);
@@ -98,7 +113,8 @@ function extractItems(lines) {
     } else {
       // Extract name (everything before the price)
       name = line.substring(0, priceMatch.index).trim();
-      // Remove leading numbers that might be item numbers
+      // Remove leading numbers/symbols
+      name = name.replace(/^[\s:;.,rpRp]+/, '').trim();
       name = name.replace(/^\d{1,2}[\.\)\s]+/, '').trim();
       // Remove trailing qty indicators
       name = name.replace(/\s+\d+\s*$/, '').trim();
@@ -119,7 +135,8 @@ function extractItems(lines) {
 function extractTotal(lines) {
   for (let i = lines.length - 1; i >= 0; i--) {
     const line = lines[i];
-    if (/^(total|grand\s*total)/i.test(line)) {
+    // Mandiri/EDC style: "TOTAL : Rp 25.000" or just "TOTAL 25.000"
+    if (/^(total|grand\s*total|tarik\s*tunai|jumlah)/i.test(line)) {
       const match = line.match(/(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{1,2})?)\s*$/);
       if (match) return parsePrice(match[1]);
     }
@@ -127,17 +144,4 @@ function extractTotal(lines) {
   return null;
 }
 
-function parsePrice(str) {
-  // Handle Indonesian format: 10.000 or 10,000
-  let cleaned = str.replace(/\s/g, '');
-
-  // If ends with .XX or ,XX where XX is 1-2 digits, treat as decimal
-  if (/[.,]\d{1,2}$/.test(cleaned) && !/[.,]\d{3}/.test(cleaned)) {
-    cleaned = cleaned.replace(',', '.');
-  } else {
-    // Remove thousand separators
-    cleaned = cleaned.replace(/[.,]/g, '');
-  }
-
-  return Math.round(parseFloat(cleaned) || 0);
-}
+// parsePrice moved to utils.js
