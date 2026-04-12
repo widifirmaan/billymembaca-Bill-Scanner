@@ -160,6 +160,7 @@ body {
   background: #000;
   aspect-ratio: 3/4;
   max-height: 65vh;
+  margin: 0 auto;
 }
 
 #camera-preview {
