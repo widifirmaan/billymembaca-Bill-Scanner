@@ -1,6 +1,6 @@
-# 🧾 Billy Membaca - Scanner Nota Belanja
+# 🧾 AI Bill Scanner - ExpressJS Intelligent Receipt Analysis with AI and OCR
 
-**Billy Membaca** is a modern, high-performance web application designed to scan, extract, and manage shopping receipt data automatically. Powered by advanced **Groq AI (Vision)** and robust **OCR (Tesseract.js)**, this tool simplifies expense tracking by converting receipt images into structured data.
+**AI Bill Scanner** is a modern, high-performance web application designed to scan, extract, and manage shopping receipt data automatically. Powered by advanced **Groq AI (Vision)** and robust **OCR (Tesseract.js)**, this tool simplifies expense tracking by converting receipt images into structured, actionable data. It features a custom **liquid-glass design system** optimized for mobile workflows, with real-time AI parsing and multi-scan capabilities for long receipts.
 
 ![Status](https://img.shields.io/badge/Status-Active_Development-success?style=for-the-badge)
 ![Vite](https://img.shields.io/badge/Vite-Latest-646CFF?style=for-the-badge&logo=vite)
@@ -10,21 +10,14 @@
 
 ---
 
-## 📸 Application Showcase
+Experience a seamless workflow from capturing receipts to managing data with **AI Bill Scanner**.
 
-Experience a seamless workflow from capturing receipts to managing data.
-
-### Core Interfaces
 | | |
 |:---:|:---:|
-| **Camera View** | **Scan Result** |
-| ![Camera](public/screenshots/camera.png)<br>*Manual AI/OCR Toggle & Controls* | ![Result](public/screenshots/result.png)<br>*Structured Data Extraction* |
-| **History View** | **Settings** |
-| ![History](public/screenshots/history.png)<br>*Manage Saved Receipts* | ![Settings](public/screenshots/settings.png)<br>*AI & Image Quality Config* |
+| ![Camera](public/screenshots/camera.png)<br>**Camera View**<br>*Manual AI/OCR Toggle & Controls* | ![Result](public/screenshots/result.png)<br>**Scan Result**<br>*Structured Data Extraction* |
+| ![History](public/screenshots/history.png)<br>**History View**<br>*Manage Saved Receipts* | ![Settings](public/screenshots/settings.png)<br>**Settings**<br>*AI & Image Quality Config* |
 
 ---
-
-## 🚀 Features Overview
 
 ### 🤖 Intelligent Extraction
 *   **Dual Engine Support**: Choose between high-accuracy **AI Analysis (Groq Vision)** or fast **Local OCR (Tesseract.js)**.
@@ -33,33 +26,27 @@ Experience a seamless workflow from capturing receipts to managing data.
 
 ### 📊 Data Management
 *   **Export to Excel**: One-click export for individual receipts or the entire history to `.xls` / `.csv` format.
-*   **Persistent History**: All scans are saved locally using IndexDB/LocalStorage, ensuring data persists after page reloads.
-*   **Dynamic Editing**: Manually adjust extracted items, quantities, and prices before saving.
+*   **Persistent History**: All scans are saved locally using **IndexedDB**, ensuring data persists across sessions.
+*   **Dynamic Editing**: Manually adjust extracted items, quantities, and prices before saving to history.
 
 ### 📱 Modern Experience
-*   **Mobile-First Design**: Premium dark-mode UI with silk animations and glassmorphic elements.
-*   **PWA Ready**: Installable on Android and iOS with offline caching support.
-*   **Responsive Camera**: Supports multiple camera orientations and instant camera flipping.
+*   **Mobile-First Design**: Premium dark-mode UI with silk animations and glassmorphic elements (Liquid Glass aesthetic).
+*   **PWA Ready**: Fully installable on Android and iOS with service worker caching for offline access.
+*   **Responsive Camera**: Supports multiple orientations and instant camera flipping for versatile scanning.
 
 ---
 
-## 🛠️ Tech Stack
-
-### Frontend & Analytics
+### 🛠️ Technical Stack
 *   **Framework**: Vite (Vanilla JavaScript)
 *   **AI Engine**: Groq AI SDK (`llama-3.2-11b-vision-preview`)
-*   **OCR Library**: Tesseract.js (Multi-language support)
+*   **OCR Library**: Tesseract.js (Local Client-Side Processing)
 *   **Styling**: Pure CSS3 (Custom Design System with Glassmorphism)
 *   **Data Export**: SheetJS (XLSX implementation)
-
-### Infrastructure
-*   **Storage**: Browser LocalStorage & IndexedDB
-*   **Offline**: Service Worker (Custom Cache implementation)
-*   **Deployment**: Optimized for Vercel / Netlify / GitHub Pages
+*   **Infrastructure**: IndexedDB & LocalStorage for zero-backend persistence.
 
 ---
 
-## 📂 Project Structure
+### 📂 Project Structure
 
 ```bash
 /
@@ -78,31 +65,40 @@ Experience a seamless workflow from capturing receipts to managing data.
 
 ---
 
-## 📦 Getting Started
+### 📦 Getting Started
 
-### Prerequisites
+#### Prerequisites
 *   **Node.js 18+**
 *   **Groq API Key**: Obtain one from the [Groq Console](https://console.groq.com/keys).
 
-### Installation & Development
-1.  **Clone the repository**
-2.  **Install Dependencies**
-    ```bash
-    npm install
-    ```
-3.  **Setup Environment Variables**
-    Create a `.env` file in the root directory:
-    ```env
-    VITE_GROQ_API_KEY=your_groq_api_key_here
-    ```
-4.  **Run Development Server**
-    ```bash
-    npm run dev
-    ```
-    *Open the provided local URL (usually [http://localhost:5173](http://localhost:5173)) to start scanning.*
+#### Installation & Development
+```bash
+# Clone the repository
+git clone https://github.com/widifirmaan/billymembaca-Bill-Scanner.git
+
+# Install Dependencies
+npm install
+
+# Setup Environment Variables
+# Create a .env file in the root directory:
+echo "VITE_GROQ_API_KEY=your_groq_api_key_here" > .env
+
+# Run Development Server
+npm run dev
+```
+*Open the provided local URL (usually [http://localhost:5173](http://localhost:5173)) to start scanning.*
 
 ---
 
 ## 👥 Authors
 
 Developed by **Widi Firmaan**.
+
+---
+
+## 📜 License
+This project is developed for productivity and expense management. Any distribution or commercial use requires prior authorization.
+
+---
+
+**AI Bill Scanner - Precision in Every Pixel** 🚀

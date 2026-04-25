@@ -1,4 +1,4 @@
-// Billy Membaca - Main Application Controller
+// AI Bill Scanner - Main Application Controller
 
 import './style.css';
 import { startCamera, stopCamera, flipCamera, capturePhoto, compressFileImage, getBase64Data, getFileSizeKB } from './camera.js';

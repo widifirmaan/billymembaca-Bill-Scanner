@@ -1,6 +1,6 @@
 {
-  "appId": "com.billymembaca.app",
-  "appName": "Billy Membaca",
+  "appId": "com.aibillscanner.app",
+  "appName": "AI Bill Scanner",
   "webDir": "dist",
   "bundledWebRuntime": false
 }

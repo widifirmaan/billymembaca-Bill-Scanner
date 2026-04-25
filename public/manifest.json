@@ -1,7 +1,7 @@
 {
-  "name": "Billy Membaca",
-  "short_name": "Billy",
-  "description": "Scanner nota belanja dengan AI - foto, baca otomatis, export Excel",
+  "name": "AI Bill Scanner",
+  "short_name": "AI Bill",
+  "description": "AI Bill Scanner - Scan nota belanja, baca otomatis dengan AI, dan export ke Excel",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a14",

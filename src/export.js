@@ -8,7 +8,7 @@ export function exportSingleReceipt(receipt) {
 
   // Header info
   const headerRows = [
-    ['Billy Membaca - Nota Belanja'],
+    ['AI Bill Scanner - Nota Belanja'],
     [],
     ['Toko', receipt.store_name || 'Tidak Diketahui'],
     ['Tanggal', receipt.date || '-'],
@@ -63,7 +63,7 @@ export function exportAllReceipts(receipts) {
 
   // Summary sheet
   const summaryRows = [
-    ['Billy Membaca - Ringkasan Semua Nota'],
+    ['AI Bill Scanner - Ringkasan Semua Nota'],
     [],
     ['No', 'Toko', 'Tanggal', 'Jumlah Item', 'Total', 'Metode'],
     ...receipts.map((r, i) => [
